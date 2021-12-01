@@ -60,11 +60,11 @@ input_type() -> number_list.
 %% 
 %% How many measurements are larger than the previous measurement?
 p1(Depths) ->
-    length([1 || true <- lists:zipwith(
-        fun (A, B) -> B > A end,
-        lists:droplast(Depths),
-        tl(Depths)
-    )]).
+    p1(Depths, 0).
+
+p1([Prev, Next | _] = Depths, Increases) when Next  > Prev -> p1(tl(Depths), Increases + 1);
+p1([Prev, Next | _] = Depths, Increases) when Next =< Prev -> p1(tl(Depths), Increases);
+p1(_Depths, Increases) -> Increases.
 
 -ifdef(EUNIT).
 
@@ -121,16 +121,14 @@ p1_example_test() ->
 %% Consider sums of a three-measurement sliding window.
 %% How many sums are larger than the previous sum?
 p2(Depths) ->
-    Windows = windows(Depths),
-    p1(Windows).
+    p1(windows(Depths)).
+
 
 windows(Depths) ->
-    lists:zipwith3(
-        fun (A, B, C) -> A + B + C end,
-        lists:droplast(lists:droplast(Depths)),
-        tl(lists:droplast(Depths)),
-        tl(tl(Depths))
-    ).
+    windows(Depths, []).
+
+windows([A, B, C | _] = Depths, Windows) -> windows(tl(Depths), [A + B + C | Windows]);
+windows(_Depths, Windows) -> lists:reverse(Windows).
 
 -ifdef(EUNIT).
 
