@@ -16,7 +16,7 @@ groups_and_lines(Name) ->
 -spec raw(Name :: string()) -> Data :: binary().
 
 raw(Name) ->
-    Path = filename:join([code:priv_dir(aoc2020), Name ++ ".txt"]),
+    Path = filename:join([code:priv_dir(aoc2021), Name ++ ".txt"]),
     {ok, Data} = file:read_file(Path),
     Data.
 
