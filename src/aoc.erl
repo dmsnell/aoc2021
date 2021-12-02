@@ -1,6 +1,8 @@
 -module(aoc).
 
 -export([
+    sloppy_benchmark/2,
+    sloppy_benchmark/3,
     solve/2,
     solve_all/0
 ]).
@@ -25,6 +27,35 @@ problem_sort(A, B) ->
     SortA = {binary_to_integer(DayA), binary_to_integer(PartA)},
     SortB = {binary_to_integer(DayB), binary_to_integer(PartB)},
     SortA < SortB.
+
+
+sloppy_benchmark(Day, Part) ->
+    sloppy_benchmark(Day, Part, 200).
+
+sloppy_benchmark(Day, Part, Iterations) ->
+    WarmupIterations = 25,
+    _Warmup = lists:foreach(
+        fun (_) -> solve(Day, Part) end,
+        lists:seq(1, WarmupIterations)
+    ),
+    {Total, Measured} = timer:tc(fun () ->
+        Times = [
+            begin
+                {Day, Part, _Answer, {MS, ms}} = solve(Day, Part),
+                MS
+            end
+            || _ <- lists:seq(1, Iterations)
+        ],
+        ms(lists:sum(Times) / Iterations)
+    end),
+    #{
+        measured  => Measured,
+        total     => ms(Total / 1000),
+        total_per => ms(Total / Iterations / 1000)
+    }.
+
+ms(MS) ->
+    {round(MS * 1000) / 1000, ms}.
 
 solve(Day, Part) ->
     utils:isolated(fun () ->
