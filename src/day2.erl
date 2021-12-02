@@ -61,18 +61,18 @@ p1(Steps) ->
 
 
 run({forward, S}, {P, D}) -> {P + S, D};
-run({up, S}, {P, D})      -> {P, D - S};
-run({down, S}, {P, D})    -> {P, D + S}.
+run({up,      S}, {P, D}) -> {P, D - S};
+run({down,    S}, {P, D}) -> {P, D + S}.
 
 
 -ifdef(EUNIT).
 
 example() -> [
     {forward, 5},
-    {down, 5},
+    {down,    5},
     {forward, 8},
-    {up, 3},
-    {down, 8},
+    {up,      3},
+    {down,    8},
     {forward, 2}
 ].
 
@@ -123,9 +123,9 @@ p2(Steps) ->
     Position * Depth.
 
 
-run2({forward, S}, {P, D, A}) -> {P + S, D + S * A, A};
-run2({up, S}, {P, D, A})      -> {P, D, A - S};
-run2({down, S}, {P, D, A})    -> {P, D, A + S}.
+run2({forward, S}, {P, D, A}) -> {P + S,  D + S * A,  A    };
+run2({up,      S}, {P, D, A}) -> {P,              D,  A - S};
+run2({down,    S}, {P, D, A}) -> {P,              D,  A + S}.
 
 
 -ifdef(EUNIT).
@@ -137,10 +137,6 @@ p2_test() ->
 
 %%% Helpers
 
-parse_step(Line) ->
-    [Command, Scale] = binary:split(Line, <<" ">>),
-    {parse_command(Command), binary_to_integer(Scale)}.
-
-parse_command(<<"forward">>) -> forward;
-parse_command(<<"up">>) -> up;
-parse_command(<<"down">>) -> down.
+parse_step(<<"forward ", Scale/binary>>) -> {forward, binary_to_integer(Scale)};
+parse_step(<<"up ",      Scale/binary>>) -> {up,      binary_to_integer(Scale)};
+parse_step(<<"down ",    Scale/binary>>) -> {down,    binary_to_integer(Scale)}.
