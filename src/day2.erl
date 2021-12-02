@@ -56,22 +56,13 @@ parse_input(Lines) ->
 %% after following the planned course. What do you get if you
 %% multiply your final horizontal position by your final depth?
 p1(Steps) ->
-    {Position, Depth} = run(Steps),
+    {Position, Depth} = lists:foldl(fun run/2, {0, 0}, Steps),
     Position * Depth.
 
 
-run(Steps) ->
-    run(Steps, {0, 0}).
-
-run([], FinalCoords) ->
-    FinalCoords;
-run([{Command, S} | Steps], {Position, Depth}) ->
-    Next = case Command of
-        forward -> {Position + S, Depth};
-        up      -> {Position, Depth - S};
-        down    -> {Position, Depth + S}
-    end,
-    run(Steps, Next).
+run({forward, S}, {P, D}) -> {P + S, D};
+run({up, S}, {P, D})      -> {P, D - S};
+run({down, S}, {P, D})    -> {P, D + S}.
 
 
 -ifdef(EUNIT).
@@ -128,19 +119,13 @@ p1_test() ->
 %% position and depth you would have after following the planned course.
 %% What do you get if you multiply your final horizontal position by your final depth?
 p2(Steps) ->
-    {Position, Depth} = run2(Steps, {0, 0, 0}),
+    {Position, Depth, _Aim} = lists:foldl(fun run2/2, {0, 0, 0}, Steps),
     Position * Depth.
 
 
-run2([], {Position, Depth, _Aim}) ->
-    {Position, Depth};
-run2([{Command, S} | Steps], {P, D, A}) ->
-    Next = case Command of
-        forward -> {P + S, D + S * A, A};
-        up      -> {P, D, A - S};
-        down    -> {P, D, A + S}
-    end,
-    run2(Steps, Next).
+run2({forward, S}, {P, D, A}) -> {P + S, D + S * A, A};
+run2({up, S}, {P, D, A})      -> {P, D, A - S};
+run2({down, S}, {P, D, A})    -> {P, D, A + S}.
 
 
 -ifdef(EUNIT).
