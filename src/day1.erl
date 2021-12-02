@@ -1,4 +1,5 @@
 -module(day1).
+-behavior(aoc).
 -include_lib("eunit/include/eunit.hrl").
 
 -export([input_type/0, p1/1, p2/1]).
