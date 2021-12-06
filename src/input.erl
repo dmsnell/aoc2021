@@ -4,6 +4,7 @@
     groups_and_lines/1,
     lines/1,
     number_list/1,
+    numbers/1,
     raw/1
 ]).
 
@@ -29,3 +30,6 @@ lines(Name) ->
 
 number_list(Name) ->
     lists:map(fun binary_to_integer/1, lines(Name)).
+
+numbers(Name) ->
+    lists:map(fun binary_to_integer/1, binary:split(raw(Name), <<",">>, [global])).
