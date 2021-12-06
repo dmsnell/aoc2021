@@ -12,24 +12,40 @@ p1(Ages) ->
     p1(Ages, 80).
 
 p1(Ages, Days) ->
-    Map = build(Days),
-    length(Ages) + lists:sum([maps:get(On - 9, Map) || On <- Ages]).
+    descendants(build(Days), [Age - 9 || Age <- Ages]).
 
 
+%% Map out how many children would be born to
+%% a fish if that fish were born on each day.
+%% 
+%% By working backwards we get auto-memoization
+%% through the data structure and we can compute
+%% this in a single pass.
+%% 
+%% The ending day is funny because of 0/1 indexing.
 build(End) ->
     build(#{}, End - 1, End - 1).
 
-build(Map, -9, _End) -> Map;
+% Starting fish are born "before time" to avoid
+% having to special-case them for the first
+% round of child-bearing.
+build(Map, -9, _End) ->
+    Map;
+
+% Fish born within the initial spawn time of
+% the last day never have children, so they get 0.
 build(Map, Day, End) when Day > End - 9 ->
     build(Map#{Day => 0}, Day - 1, End);
-build(Map, Day, End) ->
-    SpawnOn = lists:seq(Day + 9, End, 7),
-    build(
-        Map#{Day => length(SpawnOn) + lists:sum([maps:get(On, Map) || On <- SpawnOn])},
-        Day - 1,
-        End
-    ).
 
+% Every other fish spawns a computable number of
+% direct children, and we add the number of fish
+% descendants that those children spawn, which we
+% have thankfully already computed by now.
+build(Map, Day, End) ->
+    build(Map#{Day => descendants(lists:seq(Day + 9, End, 7)), Day - 1, End).
+
+descendants(Map, SpawnedOn) ->
+    length(SpawnedOn) + lists:sum([maps:get(Day, Map) || Day <- SpawnedOn]).
 
 -ifdef(EUNIT).
 
