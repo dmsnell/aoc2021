@@ -42,7 +42,7 @@ build(Map, Day, End) when Day > End - 9 ->
 % descendants that those children spawn, which we
 % have thankfully already computed by now.
 build(Map, Day, End) ->
-    build(Map#{Day => descendants(lists:seq(Day + 9, End, 7)), Day - 1, End).
+    build(Map#{Day => descendants(Map, lists:seq(Day + 9, End, 7))}, Day - 1, End).
 
 descendants(Map, SpawnedOn) ->
     length(SpawnedOn) + lists:sum([maps:get(Day, Map) || Day <- SpawnedOn]).
