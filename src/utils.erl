@@ -4,13 +4,18 @@
     count/3,
     isolated/1,
     isolated/2,
-    shuffle/1
+    shuffle/1,
+    split_by/2
 ]).
 
 count(Mapper, Value, List)
     when is_function(Mapper),
          is_list(List) ->
     length([1 || Item <- List, Mapper(Item) == Value]).
+
+
+split_by(Input, Divider) ->
+    binary:split(Input, Divider, [global, trim]).
 
 isolated(Function) ->
     isolated(Function, 1000).
